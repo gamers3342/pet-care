@@ -117,6 +117,7 @@ export async function getUserCommunityPosts() {
   const localUser = authService.getCurrentUser();
   if (!localUser?.email) return [];
   
+  // Try fetching from Supabase first
   const { data, error } = await supabase
     .from('community_post')
     .select('*')
@@ -124,10 +125,22 @@ export async function getUserCommunityPosts() {
     .order('created_at', { ascending: false });
   
   if (error) {
-    console.error('Error fetching community posts:', error);
-    return [];
+    console.error('Error fetching community posts from Supabase:', error);
   }
-  return data || [];
+  
+  // Also check localStorage for any posts saved there
+  const localPosts = JSON.parse(localStorage.getItem('communityPosts') || '[]');
+  const userLocalPosts = localPosts.filter((p: any) => p.user_email === localUser.email);
+  
+  // Combine both sources
+  const allPosts = [...(data || []), ...userLocalPosts];
+  
+  // Remove duplicates based on post_id
+  const uniquePosts = allPosts.filter((post, index, self) => 
+    index === self.findIndex((p) => p.post_id === post.post_id)
+  );
+  
+  return uniquePosts;
 }
 
 export async function deleteUserCommunityPost(postId: number) {

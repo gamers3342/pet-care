@@ -21,7 +21,9 @@ class CommunityService {
     try {
       // Get the current user from localStorage
       const userData = localStorage.getItem('userData');
-      const user_name = userData ? JSON.parse(userData).name : 'Community Member';
+      const user = userData ? JSON.parse(userData) : null;
+      const user_name = user?.name || 'Community Member';
+      const user_email = user?.email || '';
 
       // Create post with all required fields
       const postData: any = {
@@ -31,6 +33,7 @@ class CommunityService {
         area: post.area || 'General',
         location: post.location || '',
         user_name: user_name,
+        user_email: user_email,
         user_phone: post.user_phone || '',
         status: post.status || 'active',
         image_url: post.image_url || null,
@@ -55,6 +58,7 @@ class CommunityService {
           description: post.description,
           location: post.location || '',
           user_name: user_name,
+          user_email: user_email,
           type: post.type || 'general',
           area: post.area || 'General',
           status: post.status || 'active',
