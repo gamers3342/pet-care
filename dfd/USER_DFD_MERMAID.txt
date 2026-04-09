@@ -1,0 +1,43 @@
+graph TD
+    subgraph "EXTERNAL ENTITIES"
+        User[User - Pet Owner]
+        Email[Email Service]
+    end
+
+    User -->|Register/Login| Auth[Registration/Login]
+    
+    subgraph "USER PROCESSES"
+        Auth -->|Verify OTP| Home[Home Page]
+        
+        Home -->|View/Book| Clinics[View Clinics]
+        Home -->|View/Book| Services[View Services]
+        Home -->|Shop| Shop[Shop & Cart]
+        Home -->|Post| Community[Community Posts]
+        Home -->|Register| Events[Event Registration]
+        
+        Clinics -->|Select| BookVet[Book Vet Appointment]
+        Services -->|Select| BookGroom[Book Grooming]
+        Shop -->|Checkout| Checkout[Checkout & Payment]
+        Community -->|Create| CreatePost[Create Post]
+        Events -->|SignUp| Register[Event Registration]
+    end
+
+    subgraph "DATABASE"
+        DB1[(app_user)]
+        DB2[(clinic)]
+        DB3[(grooming_service)]
+        DB4[(appointment)]
+        DB5[(order)]
+        DB6[(community_post)]
+        DB7[(event_registration)]
+    end
+
+    Auth -->|Save User| DB1
+    BookVet -->|Insert| DB4
+    BookGroom -->|Insert| DB4
+    Checkout -->|Insert| DB5
+    CreatePost -->|Insert| DB6
+    Register -->|Insert| DB7
+    
+    BookVet -->|Get Clinics| DB2
+    BookGroom -->|Get Services| DB3

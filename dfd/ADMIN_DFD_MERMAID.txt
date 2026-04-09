@@ -1,0 +1,33 @@
+graph TD
+    subgraph "EXTERNAL ENTITIES"
+        Admin[Admin User]
+    end
+
+    Admin -->|Login| Login[Login Verify]
+
+    subgraph "PROCESSES"
+        Login -->|Authenticate| Dashboard[Dashboard Stats]
+        Dashboard --> Users[Manage Users]
+        Dashboard --> Appointments[Manage Appointments]
+        Dashboard --> Clinics[Manage Clinics]
+        Dashboard --> Services[Manage Services]
+        Dashboard --> Orders[Manage Orders]
+        Dashboard --> Community[Manage Community Posts]
+    end
+
+    subgraph "DATA STORES"
+        DB1[(admin)]
+        DB2[(app_user)]
+        DB3[(appointment)]
+        DB4[(clinic)]
+        DB5[(grooming_service)]
+        DB6[(order)]
+        DB7[(community_post)]
+    end
+
+    Users -->|CRUD| DB2
+    Appointments -->|Delete + Email| DB3
+    Clinics -->|CRUD + Seed| DB4
+    Services -->|CRUD + Seed| DB5
+    Orders -->|Read| DB6
+    Community -->|CRUD| DB7

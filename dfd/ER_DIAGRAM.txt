@@ -1,0 +1,105 @@
+================================================================================
+                        PETS & CARE HUB - ER DIAGRAM
+================================================================================
+
+ER-Diagram:
+
++----------+       <Manages>       +----------+
+|  ADMIN   |-----------------------|   ALL    |
++----------+                       |  TABLES  |
++----------+                       +----------+
+| admin_id |                            ^
+| fname    |                            |
+| lname    |                            |
+| email    |                            |
++----------+                            |
+                                    |
+                                    |
++----------+       <Creates>         |
+|   USER   |----------------------+  |
++----------+    (1)          (N)   |  |
++----------+                     |  +----------+
+| user_id  |<--------------------+  |  |  ORDER  |
+| email    |                  |  |  +----------+
+| name     |                  |  |  |order_id |
+| auth_pro |                  |  +->|order_num|
++----------+                  |     | user_id |
+      |                       |     |total_amt|
+      | <Places>              |     | status  |
+      ▼                       |     +----------+
++----------+     (N)                 |
+|  ORDER   |---------------------+   |
++----------+                  |      |
++----------+                  |      |
+|order_id  |                  |      |
+|order_num |                  |      |
+| user_id  |------------------+      |
+|total_amt |                         |
+| status   |                         |
++----------+                         |
+                                      |
++----------+    <Books>         +----------+
+|  CLINIC  |--------------------| APPOINT  |
++----------+    (1)      (N)    +----------+
++----------+                  +----------+
+|clinic_id |                  |appoint_id|
+|clinic_nm |------------------+ clinic_id|
+|clinic_add|                  |clinic_nm |
+|contact_no|                  | user_id  |
+| vet_name |                  |user_name |
+| area    |                   |user_phone|
++----------+                  | app_date |
+                              | reason   |
+                              | status   |
+                              |service_t |
+                              +----------+
+
++----------+     <Provides>      +----------+
+| SERVICES |--------------------| APPOINT   |
++----------+    (1)       (N)    +----------+
++----------+                  +----------+
+|service_id|                  |appoint_id|
+|service_pr|-----------------+| service_t|
+|service_ad|                  +----------+
+| contact  |
+| email    |
+| area     |
++----------+
+
++----------+     <Posts>        +----------+
+|   USER   |--------------------|COMMUNITY |
++----------+    (1)      (N)    +----------+
++----------+                  +----------+
+| user_id  |                  | post_id  |
+| email    |-----------------+| title   |
+| name     |                  | descript |
++----------+                  | location |
+                              |user_name |
+                              |user_mail |
+                              |user_phone|
+                              | type    |
+                              | area    |
+                              | status  |
+                              |image_url|
+                              +----------+
+
++----------+    <Registers>    +----------+
+|   USER   |--------------------|  EVENT   |
++----------+    (1)      (N)   |REGISTRAT |
++----------+                  +----------+
+| user_id  |                  |registr_id|
+| email    |-----------------+| user_id  |
+| name     |                  |user_name |
++----------+                  |user_mail |
+                              |user_phone|
+                              |event_typ |
+                              |event_titl|
+                              | pet_name |
+                              | pet_type |
+                              | pet_breed|
+                              | pet_age  |
+                              | status   |
+                              +----------+
+
+
+[Figure 7: ER Diagram]

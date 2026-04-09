@@ -1,0 +1,33 @@
+graph TD
+    subgraph "EXTERNAL ENTITIES"
+        Customer[Customer]
+        Payment[Payment Gateway<br/>Razorpay]
+    end
+
+    Customer -->|Browse| ShopPage[Shop Page]
+    
+    subgraph "SHOP PROCESSES"
+        ShopPage -->|View| ProductList[Product List]
+        ProductList -->|Click| ProductDetail[Product Detail]
+        ProductDetail -->|Add| AddToCart[Add to Cart]
+        AddToCart -->|View| CartPage[Cart Page]
+        CartPage -->|Update| UpdateQty[Update Quantity]
+        CartPage -->|Remove| RemoveItem[Remove Item]
+        CartPage -->|Click| Checkout[Checkout]
+        Checkout -->|Razorpay| PaymentPage[Razorpay Payment]
+        Checkout -->|Demo| DemoCheckout[Demo Checkout]
+        PaymentPage -->|Success| OrderPlaced[Order Placed]
+        DemoCheckout -->|Success| OrderPlaced
+        OrderPlaced -->|Clear| ClearCart[Clear Cart]
+    end
+
+    subgraph "DATABASE"
+        DB1[(app_user)]
+        DB2[(order)]
+    end
+
+    ProductList -->|Fetch Products| Products[(Product Data)]
+    CartPage -->|Cart Context| Cart[(Cart State)]
+    Checkout -->|Get User| DB1
+    Checkout -->|Create Order| DB2
+    Payment -->|Verify| DB2

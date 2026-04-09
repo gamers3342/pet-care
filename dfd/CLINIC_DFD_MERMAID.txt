@@ -1,0 +1,32 @@
+graph TD
+    subgraph "EXTERNAL ENTITIES"
+        User[Pet Owner]
+    end
+
+    User -->|Find| ClinicsPage[Find Clinics]
+    
+    subgraph "CLINIC PROCESSES"
+        ClinicsPage -->|View| ClinicList[Clinic List]
+        ClinicList -->|Filter| FilterByArea[Filter by Area]
+        FilterByArea -->|Search| SearchClinic[Search Clinic]
+        ClinicList -->|Click| ClinicDetail[Clinic Details]
+        ClinicDetail -->|View| VetInfo[Vet Information]
+        ClinicDetail -->|View| Ratings[Ratings & Reviews]
+        ClinicDetail -->|Click| BookBtn[Book Appointment]
+        BookBtn -->|Fill| BookingForm[Booking Form]
+        BookingForm -->|Enter| PetDetails[Pet Details]
+        PetDetails -->|Select| SelectDate[Select Date/Time]
+        SelectDate -->|Submit| SubmitBooking[Submit Booking]
+        SubmitBooking -->|Confirm| BookingConfirm[Booking Confirmation]
+    end
+
+    subgraph "DATABASE"
+        DB1[(app_user)]
+        DB2[(clinic)]
+        DB3[(appointment)]
+    end
+
+    ClinicList -->|Fetch| DB2
+    BookingForm -->|Get User| DB1
+    SubmitBooking -->|Insert| DB3
+    BookingConfirm -->|Email| Email[(Email Service)]

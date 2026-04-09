@@ -1,0 +1,124 @@
+DFD LEVEL 1 - ADMIN PANEL
+===========================
+
+EXTERNAL ENTITIES:
+- Admin User (Administrator)
+- Database (Supabase)
+
+PROCESSES:
+1. Login Verify
+2. Dashboard Stats
+3. Manage Users
+4. Manage Appointments
+5. Manage Clinics
+6. Manage Services
+7. Manage Orders
+8. Manage Community Posts
+
+DATA STORES:
+- admin
+- app_user
+- appointment
+- clinic
+- grooming_service
+- order
+- community_post
+- event_registration
+
+========================
+DATA FLOW
+========================
+
+         ┌──────────────┐
+         │   ADMIN      │
+         │   USER       │
+         └──────┬───────┘
+                │
+                ▼
+         ┌──────────────┐
+         │  LOGIN      │
+         │  VERIFY     │
+         └──────┬───────┘
+                │
+                ▼
+         ┌──────────────┐
+         │  DASHBOARD   │
+         │   STATS      │
+         └──────┬───────┘
+                │
+                ▼
+    ┌───────────┴───────────┐
+    │   ADMIN PANEL         │
+    │  ┌──────┐ ┌────────┐  │
+    │  │USERS │ │APPOINT │  │
+    │  │CLINIC│ │SERVICE │  │
+    │  │ORDER │ │COMMUNITY│  │
+    │  └──────┘ └────────┘  │
+    └───────────┬───────────┘
+                │
+                ▼
+    ┌───────────────────────┐
+    │     DATABASE          │
+    │   (SUPABASE)          │
+    └───────────────────────┘
+
+========================
+SQL QUERIES
+========================
+
+-- LOGIN VERIFY
+SELECT * FROM admin WHERE email = 'admin@123' AND password = 'admin123';
+
+-- DASHBOARD STATS
+SELECT 
+  (SELECT COUNT(*) FROM app_user) AS total_users,
+  (SELECT COUNT(*) FROM appointment) AS total_appointments,
+  (SELECT COUNT(*) FROM clinic) AS total_clinics,
+  (SELECT COUNT(*) FROM grooming_service) AS total_services,
+  (SELECT COUNT(*) FROM public.order) AS total_orders,
+  (SELECT COUNT(*) FROM community_post) AS total_posts;
+
+-- GET ALL USERS
+SELECT * FROM app_user ORDER BY created_at DESC;
+
+-- ADD USER
+INSERT INTO app_user (email, name) VALUES ('email', 'name');
+
+-- DELETE USER
+DELETE FROM app_user WHERE user_id = 1;
+
+-- GET ALL APPOINTMENTS
+SELECT * FROM appointment ORDER BY created_at DESC;
+
+-- DELETE APPOINTMENT
+DELETE FROM appointment WHERE appointment_id = 1;
+
+-- GET ALL CLINICS
+SELECT * FROM clinic ORDER BY created_at DESC;
+
+-- ADD CLINIC
+INSERT INTO clinic (clinic_name, clinic_address, contact_no) VALUES ('name', 'address', 'phone');
+
+-- DELETE CLINIC
+DELETE FROM clinic WHERE clinic_id = 1;
+
+-- GET ALL SERVICES
+SELECT * FROM grooming_service ORDER BY created_at DESC;
+
+-- ADD SERVICE
+INSERT INTO grooming_service (service_provider, service_address) VALUES ('name', 'address');
+
+-- DELETE SERVICE
+DELETE FROM grooming_service WHERE service_id = 1;
+
+-- GET ALL ORDERS
+SELECT * FROM public.order ORDER BY created_at DESC;
+
+-- GET ALL COMMUNITY POSTS
+SELECT * FROM community_post ORDER BY created_at DESC;
+
+-- UPDATE POST STATUS
+UPDATE community_post SET status = 'resolved' WHERE post_id = 1;
+
+-- DELETE POST
+DELETE FROM community_post WHERE post_id = 1;

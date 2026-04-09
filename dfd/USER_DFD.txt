@@ -1,0 +1,107 @@
+DFD LEVEL 1 - USER SIDE
+========================
+
+EXTERNAL ENTITIES:
+- User (Customer)
+- Email Service (EmailJS)
+- Database (Supabase)
+
+PROCESSES:
+1. Registration/Login (OTP)
+2. View Clinics
+3. Book Vet Appointment
+4. View Services (Grooming)
+5. Book Grooming Service
+6. Shop & Add to Cart
+7. Checkout & Create Order
+8. Create Community Post
+9. Event Registration
+
+DATA STORES:
+- app_user
+- clinic
+- grooming_service
+- appointment
+- order
+- community_post
+- event_registration
+
+========================
+DATA FLOW
+========================
+
+         ┌────────────┐
+         │    USER    │
+         └─────┬──────┘
+               │
+               ▼
+         ┌────────────┐
+         │  REGISTER  │
+         │   LOGIN    │
+         └─────┬──────┘
+               │
+               ▼
+         ┌────────────┐
+         │  HOME PAGE │
+         └─────┬──────┘
+               │
+               ├──────────────┬──────────────┬──────────────┐
+               ▼              ▼              ▼              ▼
+         ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐
+         │  CLINICS  │ │ SERVICES  │ │   SHOP    │ │COMMUNITY  │
+         └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘
+               │            │            │            │
+               ▼            ▼            ▼            ▼
+         ┌───────────────────────────────────────────────────┐
+         │           BOOK APPOINTMENT / CHECKOUT            │
+         └─────────────────────┬─────────────────────────────┘
+                               │
+                               ▼
+         ┌───────────────────────────────────────────────────┐
+         │                  DATABASE                         │
+         │   app_user | appointment | order | community_post│
+         │   clinic | grooming_service | event_registration │
+         └───────────────────────────────────────────────────┘
+
+========================
+SQL QUERIES
+========================
+
+-- USER REGISTRATION
+INSERT INTO app_user (email, name, auth_provider) 
+VALUES ('email', 'name', 'otp');
+
+-- USER LOGIN
+SELECT * FROM app_user WHERE email = 'email';
+
+-- VIEW ALL CLINICS
+SELECT * FROM clinic;
+
+-- VIEW ALL SERVICES
+SELECT * FROM grooming_service;
+
+-- BOOK VET APPOINTMENT
+INSERT INTO appointment (user_id, clinic_id, clinic_name, clinic_address, 
+user_name, user_phone, pet_name, appointment_date, reason, status, service_type) 
+VALUES (1, 1, 'Clinic Name', 'Address', 'User Name', 'Phone', 
+'Pet Name', 'Date', 'Reason', 'scheduled', 'vet');
+
+-- BOOK GROOMING SERVICE
+INSERT INTO appointment (user_id, clinic_name, clinic_address, 
+user_name, user_phone, pet_name, appointment_date, reason, status, service_type) 
+VALUES (1, 'Service Name', 'Address', 'User Name', 'Phone', 
+'Pet Name', 'Date', 'Reason', 'scheduled', 'grooming');
+
+-- CREATE ORDER
+INSERT INTO public.order (order_number, user_id, user_name, total_amount, status) 
+VALUES ('ORD-123', 1, 'User Name', 500, 'paid');
+
+-- CREATE COMMUNITY POST
+INSERT INTO community_post (title, description, location, user_name, 
+user_email, user_phone, type, area, status) 
+VALUES ('Title', 'Description', 'Location', 'User Name', 'email', 'phone', 'type', 'area', 'open');
+
+-- EVENT REGISTRATION
+INSERT INTO event_registration (user_id, user_name, user_email, user_phone, 
+event_type, event_title, pet_name, status) 
+VALUES (1, 'User', 'email', 'phone', 'type', 'title', 'pet', 'registered');
