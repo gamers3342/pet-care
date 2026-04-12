@@ -176,8 +176,10 @@ CREATE POLICY "Allow public delete on appointment" ON public.appointment FOR DEL
 CREATE TABLE IF NOT EXISTS public.order (
   order_id BIGSERIAL PRIMARY KEY,
   order_number TEXT UNIQUE,
+  order_name TEXT,
   user_id BIGINT REFERENCES public.app_user(user_id) ON DELETE SET NULL,
   user_name TEXT,
+  quantity INTEGER DEFAULT 1,
   total_amount DECIMAL(10, 2) DEFAULT 0,
   status TEXT DEFAULT 'pending',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

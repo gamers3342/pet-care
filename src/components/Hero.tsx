@@ -84,9 +84,9 @@ const Hero = () => {
           <div className="relative">
             <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-105">
               <img
-                src="https://images.pexels.com/photos/4587998/pexels-photo-4587998.jpeg?auto=compress&cs=tinysrgb&w=800"
+                src="/gato-y-perro-posando-tranquilamente-600nw-2632471447.jpeg"
                 alt="Happy pet with owner at vet clinic"
-                className="w-full h-[600px] object-cover"
+                className="w-full h-[650px] object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-mint-900/30 via-transparent to-peach-500/20"></div>
             </div>

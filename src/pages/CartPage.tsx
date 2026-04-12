@@ -27,15 +27,18 @@ const CartPage: React.FC = () => {
     if (cartItems.length === 0) return;
     setProcessingDemo(true);
     try {
-      await createPaidOrder(
+      console.log('Starting checkout...');
+      const result = await createPaidOrder(
         cartItems.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
         getTotalPrice()
       );
-      alert('Order placed successfully! (Demo Mode)\nThank you for your purchase!');
+      console.log('Order created:', result);
+      alert('Order placed successfully!\nThank you for your purchase!');
       clearCart();
-    } catch (err) {
-      console.error('Demo checkout error:', err);
-      alert('Failed to place order. Please try again.');
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      const errorMsg = err?.message || err?.toString() || 'Unknown error';
+      alert(`Failed to place order: ${errorMsg}\n\nCheck console for details.`);
     } finally {
       setProcessingDemo(false);
     }

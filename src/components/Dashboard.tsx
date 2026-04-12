@@ -43,89 +43,154 @@ const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({ show, a
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-sky-600 to-sky-700 p-6 text-white">
+      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl overflow-hidden print:shadow-none print:border-0 print:w-full">
+        {/* Header - Ticket Style */}
+        <div className={`bg-gradient-to-r ${isClinic ? 'from-blue-600 to-sky-600' : 'from-orange-500 to-peach-500'} p-6 text-white print:bg-gray-800`}>
           <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-2xl font-bold">Appointment Details</h3>
-              <p className="text-sky-100">Booking Reference: #{appointment.appointment_id}</p>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                {isClinic ? <PawPrint className="w-8 h-8" /> : <FileText className="w-8 h-8" />}
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold">{isClinic ? '🏥 VET CLINIC APPOINTMENT' : '✂️ GROOMING SESSION'}</h3>
+                <p className="text-white/80">Pets & Care Hub</p>
+              </div>
             </div>
-            <button onClick={onClose} className="p-2 bg-white/20 rounded-lg hover:bg-white/30">
+            <button onClick={onClose} className="p-2 bg-white/20 rounded-full hover:bg-white/30 print:hidden">
               <X className="w-6 h-6" />
             </button>
           </div>
         </div>
 
+        {/* Booking Reference - Like Boarding Pass */}
+        <div className="bg-gray-100 p-4 flex justify-between items-center">
+          <div>
+            <p className="text-xs text-gray-500 uppercase">Booking Reference</p>
+            <p className="text-xl font-bold text-gray-800 font-mono">APT-{appointment.appointment_id}-{Date.now().toString(36).toUpperCase()}</p>
+          </div>
+          <div className={`px-4 py-2 rounded-full text-sm font-bold ${appointment.status === 'scheduled' ? 'bg-yellow-100 text-yellow-800' : appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+            {appointment.status.toUpperCase()}
+          </div>
+        </div>
+
         <div className="p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isClinic ? 'bg-blue-100' : 'bg-orange-100'}`}>
-              {isClinic ? <PawPrint className="w-6 h-6 text-blue-600" /> : <FileText className="w-6 h-6 text-orange-600" />}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            {/* Date & Time - Like Flight Time */}
+            <div className="bg-gradient-to-br from-mint-50 to-mint-100 rounded-xl p-4 border border-mint-200">
+              <p className="text-xs text-mint-600 uppercase mb-1">📅 Date</p>
+              <p className="text-lg font-bold text-gray-800">{new Date(appointment.appointment_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
             </div>
-            <div>
-              <h4 className="text-xl font-bold text-gray-800">{isClinic ? 'Veterinary Clinic Visit' : 'Grooming Service'}</h4>
-              <span className={`px-3 py-1 rounded-full text-sm ${appointment.status === 'scheduled' ? 'bg-yellow-100 text-yellow-800' : appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                {appointment.status}
-              </span>
+            <div className="bg-gradient-to-br from-sky-50 to-sky-100 rounded-xl p-4 border border-sky-200">
+              <p className="text-xs text-sky-600 uppercase mb-1">🕐 Time</p>
+              <p className="text-lg font-bold text-gray-800">{new Date(appointment.appointment_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h5 className="font-semibold text-gray-800 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-sky-600" /> Date & Time
-              </h5>
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <p className="text-lg font-bold text-gray-800">{new Date(appointment.appointment_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                <p className="text-sky-600 font-semibold">{new Date(appointment.appointment_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
-              </div>
-
-              {appointment.pet_name && (
+          {/* Pet Details */}
+          {appointment.pet_name && (
+            <div className="bg-gray-50 rounded-xl p-4 mb-4">
+              <p className="text-sm text-gray-500 uppercase mb-2">🐾 Pet Information</p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-peach-100 rounded-full flex items-center justify-center">
+                  <PawPrint className="w-6 h-6 text-peach-600" />
+                </div>
                 <div>
-                  <h5 className="font-semibold text-gray-800 flex items-center gap-2 mb-2">
-                    <PawPrint className="w-4 h-4 text-sky-600" /> Pet Details
-                  </h5>
-                  <div className="p-4 bg-gray-50 rounded-xl">
-                    <p className="text-gray-800"><span className="font-medium">Name:</span> {appointment.pet_name}</p>
-                    {appointment.pet_breed && <p className="text-gray-600"><span className="font-medium">Breed:</span> {appointment.pet_breed}</p>}
-                    {appointment.pet_age && <p className="text-gray-600"><span className="font-medium">Age:</span> {appointment.pet_age}</p>}
-                  </div>
+                  <p className="font-bold text-gray-800">{appointment.pet_name}</p>
+                  <p className="text-sm text-gray-500">{appointment.pet_breed || ''} {appointment.pet_age ? `• ${appointment.pet_age}` : ''}</p>
                 </div>
-              )}
+              </div>
             </div>
+          )}
 
-            <div className="space-y-4">
-              <div>
-                <h5 className="font-semibold text-gray-800 flex items-center gap-2 mb-2">
-                  <MapPin className="w-4 h-4 text-sky-600" /> {isClinic ? 'Clinic' : 'Service Provider'}
-                </h5>
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-gray-800 font-semibold">{appointment.clinic_name || 'Not specified'}</p>
-                  <p className="text-gray-600 text-sm mt-1">{appointment.clinic_address || 'Address not available'}</p>
-                </div>
+          {/* Location */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-4">
+            <p className="text-sm text-gray-500 uppercase mb-2">📍 {isClinic ? 'Clinic' : 'Service Provider'}</p>
+            <p className="font-bold text-gray-800">{appointment.clinic_name || 'Not specified'}</p>
+            <p className="text-sm text-gray-500">{appointment.clinic_address || 'Address not available'}</p>
+          </div>
+
+          {/* Reason */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-4">
+            <p className="text-sm text-gray-500 uppercase mb-2">📋 Reason for Visit</p>
+            <p className="text-gray-700">{appointment.reason || 'General checkup'}</p>
+          </div>
+
+          {/* Important Notice */}
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xl">⚠️</span>
               </div>
-
               <div>
-                <h5 className="font-semibold text-gray-800 flex items-center gap-2 mb-2">
-                  <FileText className="w-4 h-4 text-sky-600" /> Reason for Visit
-                </h5>
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-gray-700">{appointment.reason || 'General checkup'}</p>
-                </div>
-              </div>
-
-              <div>
-                <h5 className="font-semibold text-gray-800 flex items-center gap-2 mb-2">
-                  <Clock3 className="w-4 h-4 text-sky-600" /> Booked On
-                </h5>
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-gray-600">{appointment.created_at ? new Date(appointment.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</p>
-                </div>
+                <p className="font-bold text-red-800">MANDATORY: Bring This Receipt to Your Appointment!</p>
+                <p className="text-sm text-red-700 mt-1">
+                  This receipt is required for identification at the clinic/service center. 
+                  Please take a printout and bring it to confirm your appointment.
+                </p>
               </div>
             </div>
           </div>
 
+          {/* User Info */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-6">
+            <p className="text-sm text-gray-500 uppercase mb-2">👤 Booked By</p>
+            <p className="font-bold text-gray-800">{appointment.user_name || 'User'}</p>
+          </div>
+
+          {/* Print Receipt Button */}
+          <div className="flex justify-center mb-4">
+            <button 
+              onClick={() => {
+                const content = `
+<!DOCTYPE html>
+<html>
+<head>
+<title>Appointment Receipt</title>
+<style>
+body { font-family: Arial; padding: 20px; max-width: 600px; margin: 0 auto; }
+.header { background: #0284c7; color: white; padding: 20px; border-radius: 10px; margin-bottom: 15px; }
+.ref { background: #f3f4f6; padding: 15px; display: flex; justify-content: space-between; margin-bottom: 15px; border-radius: 8px; }
+.status { background: #fef3c7; padding: 5px 10px; border-radius: 15px; font-size: 12px; }
+.notice { background: #fef2f2; border: 2px solid #fecaca; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+.grid > div { background: #f9fafb; padding: 12px; border-radius: 8px; }
+.label { font-size: 11px; color: #666; text-transform: uppercase; }
+.value { font-weight: bold; font-size: 14px; }
+.pet { background: #fff7ed; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+.pet-name { font-weight: bold; }
+.pet-info { font-size: 12px; color: #666; }
+.footer { text-align: center; color: #999; font-size: 11px; margin-top: 20px; }
+@media print { body { padding: 0; } }
+</style>
+</head>
+<body>
+<div class="header"><h1>🏥 ${isClinic ? 'VET CLINIC APPOINTMENT' : '✂️ GROOMING SESSION'}</h1><p>Pets & Care Hub</p></div>
+<div class="ref"><span>APT-${appointment.appointment_id}</span><span class="status">${appointment.status.toUpperCase()}</span></div>
+<div class="notice"><strong>⚠️ MANDATORY:</strong> Bring this receipt to your appointment for identification!</div>
+<div class="grid">
+<div><div class="label">📅 Date</div><div class="value">${new Date(appointment.appointment_date).toLocaleDateString()}</div></div>
+<div><div class="label">🕐 Time</div><div class="value">${new Date(appointment.appointment_date).toLocaleTimeString()}</div></div>
+</div>
+${appointment.pet_name ? `<div class="pet"><div class="label">🐾 Pet</div><div class="pet-name">${appointment.pet_name}</div><div class="pet-info">${appointment.pet_breed || ''} ${appointment.pet_age || ''}</div></div>` : ''}
+<div><div class="label">📍 ${isClinic ? 'Clinic' : 'Provider'}</div><div class="value">${appointment.clinic_name || 'N/A'}</div><div style="font-size:12px;color:#666">${appointment.clinic_address || ''}</div></div>
+<div><div class="label">📋 Reason</div><div class="value">${appointment.reason || 'General checkup'}</div></div>
+<div><div class="label">👤 Booked By</div><div class="value">${appointment.user_name || 'User'}</div></div>
+<div class="footer">Pets & Care Hub | ID: ${appointment.appointment_id}</div>
+</body>
+</html>`;
+                const w = window.open('', '', 'width=600,height=800');
+                if (w) { w.document.write(content); w.document.close(); w.print(); }
+              }} 
+              className="px-6 py-2 bg-mint-500 text-white rounded-lg hover:bg-mint-600 flex items-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              Generate Appointment Receipt
+            </button>
+          </div>
+
+          {/* Action Buttons */}
           {appointment.status === 'scheduled' && (
-            <div className="mt-6 pt-6 border-t border-gray-200 flex gap-3 justify-end">
+            <div className="flex gap-3 justify-end border-t pt-4 print:hidden">
               <button onClick={onCancel} className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 font-medium">
                 Cancel Appointment
               </button>
@@ -459,6 +524,7 @@ const Dashboard = () => {
   const [communityPosts, setCommunityPosts] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [deleteModal, setDeleteModal] = useState<{ show: boolean; type: string; id: number; title: string }>({ show: false, type: '', id: 0, title: '' });
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [successMsg, setSuccessMsg] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
@@ -821,35 +887,72 @@ const Dashboard = () => {
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-gray-800 mb-6">Track Your Orders</h3>
                 {orders.length > 0 ? (
-                  orders.map((order, index) => (
-                    <div key={index} className="p-6 border border-gray-200 rounded-xl">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <div className="font-semibold text-gray-800">{order.order_number}</div>
-                          <div className="text-sm text-gray-600">Total: ₹{order.total_amount}</div>
+                  orders.map((order, index) => {
+                    let products = [];
+                    try {
+                      if (order.products) {
+                        products = typeof order.products === 'string' ? JSON.parse(order.products) : order.products;
+                      }
+                    } catch (e) {
+                      console.error('Error parsing products:', e);
+                    }
+                    
+                    return (
+                      <div key={index} className="p-6 border border-gray-200 rounded-xl">
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <div className="font-semibold text-gray-800">{order.order_number}</div>
+                            <div className="text-sm text-gray-600">Total: ₹{order.total_amount}</div>
+                          </div>
+                          <div className="text-right">
+                            <span className={`px-3 py-1 rounded-full text-sm ${order.status === 'paid' ? 'bg-green-100 text-green-800' : order.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                              {order.status}
+                            </span>
+                            <div className="text-sm text-gray-500 mt-1">{new Date(order.created_at).toLocaleDateString()}</div>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <span className={`px-3 py-1 rounded-full text-sm ${order.status === 'paid' ? 'bg-green-100 text-green-800' : order.status === 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                            {order.status}
+                        
+                        {/* Products List */}
+                        {products.length > 0 && (
+                          <div className="mt-4 mb-4 p-4 bg-gray-50 rounded-xl">
+                            <h4 className="font-semibold text-gray-700 mb-3">Products Ordered:</h4>
+                            <div className="space-y-2">
+                              {products.map((product: any, pIndex: number) => (
+                                <div key={pIndex} className="flex justify-between items-center text-sm">
+                                  <span className="text-gray-600">{product.product_name}</span>
+                                  <span className="text-gray-500">x{product.quantity}</span>
+                                  <span className="text-gray-800 font-medium">₹{product.price * product.quantity}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Bill/Receipt Button */}
+                        <button 
+                          onClick={() => setSelectedOrder(order)}
+                          className="mt-2 px-4 py-2 bg-mint-500 text-white rounded-lg hover:bg-mint-600 flex items-center gap-2"
+                        >
+                          <FileText className="w-4 h-4" />
+                          View Bill / Receipt
+                        </button>
+                        
+                        <div className="flex items-center gap-2 mt-4">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2">
+                            <div className={`h-2 rounded-full ${order.status === 'paid' ? 'bg-green-500 w-3/4' : order.status === 'cancelled' ? 'bg-red-500 w-full' : 'bg-yellow-500 w-1/4'}`}></div>
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            {order.status === 'paid' ? 'In Transit' : order.status === 'cancelled' ? 'Cancelled' : 'Processing'}
                           </span>
-                          <div className="text-sm text-gray-500 mt-1">{new Date(order.created_at).toLocaleDateString()}</div>
                         </div>
+                        {order.status === 'paid' && (
+                          <div className="mt-4 flex gap-2">
+                            <button onClick={() => handleCancelOrder(order.order_id)} className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">Cancel Order</button>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 mt-4">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2">
-                          <div className={`h-2 rounded-full ${order.status === 'paid' ? 'bg-green-500 w-3/4' : order.status === 'cancelled' ? 'bg-red-500 w-full' : 'bg-yellow-500 w-1/4'}`}></div>
-                        </div>
-                        <span className="text-sm text-gray-600">
-                          {order.status === 'paid' ? 'In Transit' : order.status === 'cancelled' ? 'Cancelled' : 'Processing'}
-                        </span>
-                      </div>
-                      {order.status === 'paid' && (
-                        <div className="mt-4 flex gap-2">
-                          <button onClick={() => handleCancelOrder(order.order_id)} className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">Cancel Order</button>
-                        </div>
-                      )}
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <p className="text-gray-500 text-center py-8">No orders found</p>
                 )}
@@ -992,6 +1095,112 @@ const Dashboard = () => {
           }
         }}
       />
+
+      {/* Bill/Receipt Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl overflow-hidden print:shadow-none print:border-0 print:w-full">
+            <div className="bg-gradient-to-r from-mint-500 to-sky-500 p-6 text-white print:bg-gray-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">🧾 ORDER RECEIPT</h3>
+                  <p className="text-white/80">Pets & Care Hub</p>
+                </div>
+                <button onClick={() => setSelectedOrder(null)} className="p-2 bg-white/20 rounded-full hover:bg-white/30 print:hidden">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {/* Important Notice for Order */}
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-xl">📦</span>
+                  </div>
+                  <div>
+                    <p className="font-bold text-blue-800">Order Confirmation Receipt</p>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Keep this receipt for your records. It confirms your order and may be required for delivery verification.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Info */}
+              <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <p className="text-sm text-gray-500">Order Number</p>
+                  <p className="font-bold text-gray-800">{selectedOrder.order_number}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Date</p>
+                  <p className="font-bold text-gray-800">{new Date(selectedOrder.created_at).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Customer Name</p>
+                  <p className="font-bold text-gray-800">{selectedOrder.user_name || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Status</p>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${selectedOrder.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {selectedOrder.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Products Table */}
+              <div className="mb-6">
+                <h4 className="font-bold text-gray-800 mb-3">Products</h4>
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="p-2 text-left">Product</th>
+                      <th className="p-2 text-center">Qty</th>
+                      <th className="p-2 text-right">Price</th>
+                      <th className="p-2 text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      let products = [];
+                      try {
+                        products = selectedOrder.products ? (typeof selectedOrder.products === 'string' ? JSON.parse(selectedOrder.products) : selectedOrder.products) : [];
+                      } catch (e) { products = []; }
+                      return products.map((product: any, i: number) => (
+                        <tr key={i} className="border-b">
+                          <td className="p-2">{product.product_name}</td>
+                          <td className="p-2 text-center">{product.quantity}</td>
+                          <td className="p-2 text-right">₹{product.price}</td>
+                          <td className="p-2 text-right">₹{product.price * product.quantity}</td>
+                        </tr>
+                      ));
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Total */}
+              <div className="flex justify-between items-center p-4 bg-mint-50 rounded-xl border border-mint-200">
+                <span className="font-bold text-gray-800">Grand Total</span>
+                <span className="text-2xl font-bold text-mint-600">₹{selectedOrder.total_amount}</span>
+              </div>
+
+              {/* Print Button */}
+              <div className="mt-6 flex justify-center">
+                <button 
+                  onClick={() => window.print()} 
+                  className="px-6 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 flex items-center gap-2 print:hidden"
+                >
+                  <FileText className="w-4 h-4" />
+                  Print Receipt
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

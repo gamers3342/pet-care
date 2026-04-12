@@ -27,71 +27,101 @@ function generateOrderNumber(userId: number): string {
 }
 
 export async function createPaidOrder(lines: CartLine[], total: number) {
-  const localUser = authService.getCurrentUser?.();
-  let userId: number | null = null;
-  let userName: string | null = null;
-  let userEmail: string | null = null;
+  const localUser = authService.getCurrentUser();
   
-  if (localUser?.email) {
-    const { data: existing } = await supabase
-        .from('app_user')
-      .select('user_id, name, email')
-      .eq('email', localUser.email)
-      .maybeSingle();
-    if (existing?.user_id) {
-      userId = existing.user_id as number;
-      userName = existing.name;
-      userEmail = existing.email;
-    } else {
-      const { data: inserted } = await supabase
-          .from('app_user')
-        .insert([{ email: localUser.email, name: localUser.name || null, auth_provider: 'otp' }])
-        .select('user_id, name, email')
-        .single();
-      if (inserted?.user_id) {
-        userId = inserted.user_id as number;
-        userName = inserted.name;
-        userEmail = inserted.email;
-      }
+  if (!localUser?.email) {
+    throw new Error('Please login to place an order');
+  }
+
+  const userEmail = localUser.email;
+  const userName = localUser.name || 'Customer';
+
+  console.log('Order Service: Creating order for:', userEmail, 'total:', total);
+  console.log('Order Service: Products:', lines);
+
+  // First get or create the user in app_user to get user_id
+  let userId: number | null = null;
+  
+  const { data: existingUser } = await supabase
+    .from('app_user')
+    .select('user_id')
+    .eq('email', userEmail)
+    .maybeSingle();
+  
+  if (existingUser?.user_id) {
+    userId = existingUser.user_id as number;
+  } else {
+    // Create new user
+    const { data: newUser } = await supabase
+      .from('app_user')
+      .insert([{ email: userEmail, name: userName, auth_provider: 'otp' }])
+      .select('user_id')
+      .single();
+    
+    if (newUser?.user_id) {
+      userId = newUser.user_id as number;
     }
   }
 
-  // Generate better order number
-  const orderNumber = generateOrderNumber(userId || 0);
+  if (!userId) {
+    throw new Error('Failed to get user ID');
+  }
 
-  // Prepare products data
-  const productsJson = JSON.stringify(lines.map(line => ({
-    product_id: line.id,
-    product_name: line.name,
-    price: line.price,
-    quantity: line.quantity
-  })));
+  const orderNumber = 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  
+  // Get product names for order_name (comma separated if multiple)
+  const orderName = lines.map(l => l.name).join(', ');
 
-  const { data, error } = await supabase
+  console.log('Order Service: Inserting order with user_id:', userId, 'orderName:', orderName);
+
+  try {
+    const { data, error } = await supabase
       .from('order')
-    .insert([{ 
-      order_number: orderNumber, 
-      user_id: userId, 
-      user_name: userName,
-      user_email: userEmail,
-      total_amount: total, 
-      status: 'paid',
-      products: productsJson
-    }])
-    .select('order_id, order_number')
-    .single();
-  if (error) throw error;
-  return data;
+      .insert({
+        order_number: orderNumber,
+        order_name: orderName,
+        user_id: userId,
+        user_name: userName,
+        total_amount: total,
+        status: 'paid'
+      })
+      .select();
+    
+    console.log('Order Service: Insert response:', { data, error });
+    
+    if (error) {
+      console.error('Order Service: Supabase error:', error);
+      throw new Error(error.message || 'Database error: ' + JSON.stringify(error));
+    }
+    
+    if (!data || data.length === 0) {
+      throw new Error('Order was not created - no data returned');
+    }
+    
+    console.log('Order Service: Order created successfully:', data[0]);
+    return data[0];
+  } catch (err: any) {
+    console.error('Order Service: Catch block error:', err);
+    throw new Error(err.message || 'Failed to place order');
+  }
 }
 
 export async function getUserOrderWithProducts() {
-  const localUser = authService.getCurrentUser?.();
+  const localUser = authService.getCurrentUser();
   if (!localUser?.email) return [];
+  
+  const { data: userData } = await supabase
+    .from('app_user')
+    .select('user_id')
+    .eq('email', localUser.email)
+    .maybeSingle();
+  
+  if (!userData?.user_id) return [];
   
   const { data, error } = await supabase
     .from('order')
     .select('*')
-    .eq('user_email', localUser.email)
+    .eq('user_id', userData.user_id)
     .order('created_at', { ascending: false });
   
   if (error) {
